@@ -21,7 +21,7 @@ class Transaction(db.Model):
         return f"<Transaction {self.id}: {self.type} {self.amount} on {self.date}>"
 
 
-# 데이터베이스 생성
+# 데이터베이스
 with app.app_context():
     db.create_all()
 
@@ -134,6 +134,118 @@ def delete_transaction(transaction_id):
     db.session.delete(transaction)
     db.session.commit()
     return jsonify({"success": True})
+
+
+@app.route('/filter_transactions', methods=['GET'])
+def filter_transactions():
+    # 필터 매개변수 가져오기
+    month = request.args.get('month', '')
+    from_date = request.args.get('from_date', '')
+    to_date = request.args.get('to_date', '')
+    type_filter = request.args.get('type', '')
+    category = request.args.get('category', '')
+
+    # 기본 쿼리 생성
+    query = Transaction.query
+
+    # 필터 적용
+    if month:
+        # 월 필터링 (YYYY-MM 형식)
+        query = query.filter(db.func.strftime('%Y-%m', Transaction.date) == month)
+
+    if from_date:
+        # 시작 날짜 필터링
+        query = query.filter(Transaction.date >= from_date)
+
+    if to_date:
+        # 종료 날짜 필터링
+        query = query.filter(Transaction.date <= to_date)
+
+    if type_filter:
+        # 유형 필터링 (income/expense)
+        query = query.filter(Transaction.type == type_filter)
+
+    if category:
+        # 카테고리 필터링
+        query = query.filter(Transaction.category == category)
+
+    # 결과 정렬 (최신순)
+    transactions = query.order_by(Transaction.date.desc()).all()
+
+    # 결과를 JSON으로 변환
+    result = []
+    total_income = 0
+    total_expense = 0
+
+    for t in transactions:
+        result.append({
+            'id': t.id,
+            'date': t.date.strftime('%Y-%m-%d'),
+            'category': t.category,
+            'amount': t.amount,
+            'type': t.type,
+            'description': t.description
+        })
+
+        # 수입과 지출 합계 계산
+        if t.type == 'income':
+            total_income += t.amount
+        else:
+            total_expense += t.amount
+
+    # 응답에 합계 정보 추가
+    response = {
+        'transactions': result,
+        'summary': {
+            'income': total_income,
+            'expense': total_expense,
+            'balance': total_income - total_expense
+        }
+    }
+
+    return jsonify(response)
+
+
+@app.route('/get_months')
+def get_months():
+    # 거래가 있는 모든 월(YYYY-MM) 목록 조회
+    months = db.session.query(
+        db.func.strftime('%Y-%m', Transaction.date).label('month')
+    ).distinct().order_by('month').all()
+
+    result = [m[0] for m in months]
+    return jsonify(result)
+
+
+@app.route('/get_categories')
+def get_categories():
+    # 모든 카테고리 목록 조회
+    categories = db.session.query(
+        Transaction.category
+    ).distinct().order_by(Transaction.category).all()
+
+    result = [c[0] for c in categories]
+    return jsonify(result)
+
+
+@app.route('/get_current_balance')
+def get_current_balance():
+    # 전체 잔액 계산
+    total_income = db.session.query(
+        db.func.sum(Transaction.amount)
+    ).filter(Transaction.type == 'income').scalar() or 0
+
+    total_expense = db.session.query(
+        db.func.sum(Transaction.amount)
+    ).filter(Transaction.type == 'expense').scalar() or 0
+
+    balance = total_income - total_expense
+
+    return jsonify({
+        'total_income': total_income,
+        'total_expense': total_expense,
+        'balance': balance
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)

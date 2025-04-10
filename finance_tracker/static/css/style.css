@@ -23,6 +23,38 @@ body {
     color: #dc3545 !important;
 }
 
+.delete-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* 필터 영역 스타일 */
+.filter-section {
+    background-color: #f9f9f9;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* 요약 정보 스타일 */
+.summary-box {
+    background-color: #f0f8ff;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+/* 잔액 표시 강조 */
+.balance-display {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
 /* 모바일 반응형 */
 @media (max-width: 768px) {
     .container {
@@ -36,14 +68,13 @@ body {
     .table {
         font-size: 0.9rem;
     }
-}
-
-.delete-btn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-}
-
-.delete-btn:hover {
-    background-color: #c82333;
-    border-color: #bd2130;
+    
+    .filter-controls .form-label {
+        font-size: 0.9rem;
+    }
+    
+    .filter-controls .btn {
+        font-size: 0.9rem;
+        padding: 0.25rem 0.5rem;
+    }
 }
