@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가계부</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">가계부</h1>
+        
+        <!-- 거래 입력 폼 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="h5 mb-0">새 거래 입력</h2>
+            </div>
+            <div class="card-body">
+                <form action="/add_transaction" method="post">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="date" class="form-label">날짜</label>
+                            <input type="text" class="form-control" id="date" name="date" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="category" class="form-label">카테고리</label>
+                            <input type="text" class="form-control" id="category" name="category" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="amount" class="form-label">금액</label>
+                            <input type="number" class="form-control" id="amount" name="amount" min="0" step="0.01" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="type" class="form-label">유형</label>
+                            <select class="form-select" id="type" name="type" required>
+                                <option value="income">수입</option>
+                                <option value="expense">지출</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">설명</label>
+                        <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 요약 통계 표시 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h2 class="h5 mb-0">월별 요약</h2>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="monthlyChart"></canvas>
+                        <div class="mt-3">
+                            <table class="table table-striped" id="transactionsTable">
+                                <thead>
+                                    <tr>
+                                        <th>날짜</th>
+                                        <th>카테고리</th>
+                                        <th>설명</th>
+                                        <th>유형</th>
+                                        <th>금액</th>
+                                        <th>작업</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h2 class="h5 mb-0">연도별 요약</h2>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="yearlyChart"></canvas>
+                        <div class="mt-3">
+                            <table class="table table-sm table-striped" id="yearlyTable">
+                                <thead>
+                                    <tr>
+                                        <th>연도</th>
+                                        <th>수입</th>
+                                        <th>지출</th>
+                                        <th>잔액</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 최근 거래 내역 -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="h5 mb-0">최근 거래 내역</h2>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped" id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>날짜</th>
+                            <th>카테고리</th>
+                            <th>설명</th>
+                            <th>유형</th>
+                            <th>금액</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
